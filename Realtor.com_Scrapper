@@ -1,0 +1,108 @@
+# Programmers Name: Blue_Eyed_Son
+# Project Name: Realtor.com Web Scraper
+# Date: 8/12/2018
+#
+# WARNING:
+# This Program is intended for testing and for research purposes
+# This program goes against the terms and conditions of realtor.com
+
+# Brief Summary of the Functionality:
+# This Program collects all the housing information on realtor.com
+# Full Addresses,Zips,Lat and Long, Price, Sqr ft, lot size and num of garages
+# It runs daily and puts each scrape into a csv file with the date of the scrape with in the title
+# This program also has an IP hider subroutine confuse realtor.com servers to disguise my requests
+
+# Enjoy!
+
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
+from bs4 import BeautifulSoup
+import pandas as pd
+import urllib.request
+import datetime
+
+class CraiglistScraper(object):
+
+    def __init__(self):
+        self.driver = webdriver.Chrome()
+        self.delay = 3
+        self.url = "https://www.realtor.com/realestateandhomes-search/Philadelphia_PA"
+
+    def load_Realator_url(self):
+
+        #for i in range(2): #Number of pages that you want to scrape minus one Put the particular craigs list url you want to scrape
+        self.driver.get(self.url)
+        try:
+            wait = WebDriverWait(self.driver, self.delay)
+            wait.until(EC.presence_of_element_located((By.ID, "searchBox")))
+            print("Page is ready")
+        except TimeoutException:
+            print("Loading took too much time")
+
+    def extract_listing_Address(self):
+        address_list = []
+        html_page = urllib.request.urlopen(self.url)
+        soup = BeautifulSoup(html_page, "lxml")
+        for li in soup.findAll("span", {"class": "listing-street-address"}):
+            address_list.append(li.text)
+        for li in soup.findAll("span", {"class": "listing-city"}):
+            address_list.append(li.text)
+        for li in soup.findAll("span", {"class": "listing-region"}):
+            address_list.append(li.text)
+        for li in soup.findAll("span", {"class": "listing-postal"}):
+            address_list.append(li.text)
+        return address_list
+
+    def extract_listing_Price(self):
+        price_list = []
+        html_page = urllib.request.urlopen(self.url)
+        soup = BeautifulSoup(html_page, "lxml")
+        for list_p in soup.findAll("span", {"class": "data-price"}):
+            price_list.append(list_p)
+        return price_list
+
+    def extract_listing_Bed(self):
+        bed_list = []
+        html_page = urllib.request.urlopen(self.url)
+        soup = BeautifulSoup(html_page, "lxml")
+        for list_b in soup.findAll("div", {"class": "data-value meta-beds"}):
+            bed_list.append(list_b["$"])
+        return bed_list
+
+    def extract_listing_Bulk(self):
+        bulk_list = []
+        html_page = urllib.request.urlopen(self.url)
+        soup = BeautifulSoup(html_page, "lxml")
+        for list_bulk in soup.findAll("span", {"class": "data-value"}):
+            bulk_list.append(list_bulk.txt)
+        return bulk_list
+
+    def quit(self):
+        self.driver.close()
+
+
+if __name__ == "__main__":
+    scraper = CraiglistScraper()
+    scraper.load_Realator_url()
+    address = scraper.extract_listing_Address()
+    price = scraper.extract_listing_Price()
+    bed = scraper.extract_listing_Bed()
+    bulk = scraper.extract_listing_Bulk()
+    print(f"{price}")
+    page_len = 50
+    """df = pd.DataFrame({'Count': range(page_len)})
+
+    df['Address'] = pd.Series(address, index=df.index[:len(address)])
+    df['Price'] = pd.Series(price, index=df.index[:len(price)])
+    df['Bedrooms'] = pd.Series(bed, index=df.index[:len(bed)])
+    df['Bathrooms'] = pd.Series(bulk, index=df.index[:len(bulk)])
+
+    df = pd.DataFrame(df)
+    #import datetime into the csv name for output
+    df.to_csv(f'Realtors.com.csv', sep=',', header=['Count', 'Address', 'Price', 'Bedrooms', 'Bulk', ], index=None)"""
+
+    print("The File has been Read and csv has been created")
+    scraper.quit()
