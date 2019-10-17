@@ -1,0 +1,47 @@
+import pandas as pd
+import numpy as np
+from datetime import date
+
+Interest_Rate = 0.04
+Years = 30
+Payments_Year = 12
+Principal = 2000000
+Addl_Princ = 50
+start_date = (date(2016,1,1))
+
+pmt = np.pmt(Interest_Rate/Payments_Year, Years*Payments_Year, Principal)
+
+per = 1
+#Calculate the interest
+impt = np.ipmt(Interest_Rate/Payments_Year, per, Years*Payments_Year, Principal)
+
+#Calculate the principal
+ppmt = np.ppmt(Interest_Rate/Payments_Year, per, Years*Payments_Year, Principal)
+
+per = 240 # Period to calculate
+
+# Calculate the interest
+ipmt = np.ipmt(Interest_Rate/Payments_Year, per, Years*Payments_Year, Principal)
+
+# Calculate the principal
+ppmt = np.ppmt(Interest_Rate/Payments_Year, per, Years*Payments_Year, Principal)
+
+rng = pd.date_range(start_date, periods=Years * Payments_Year, freq='MS')
+rng.name = "Payment_Date"
+
+
+df = pd.DataFrame(index=rng,columns=['Payment', 'Principal', 'Interest', 'Addl_Principal', 'Balance'], dtype='float')
+df.reset_index(inplace=True)
+df.index += 1
+df.index.name = "Period"
+
+df["Payment"] = np.pmt(Interest_Rate/Payments_Year, Years*Payments_Year, Principal)
+df["Principal"] = np.ppmt(Interest_Rate/Payments_Year, df.index, Years*Payments_Year, Principal)
+df["Interest"] = np.ipmt(Interest_Rate/Payments_Year, df.index, Years*Payments_Year, Principal)
+# Convert to a negative value in order to keep the signs the same
+df = df.round(2)
+
+df["Balance"] = 0
+df.loc[1, "Balance"] = Principal + df.loc[1, "Principal"] 
+
+print(df)
