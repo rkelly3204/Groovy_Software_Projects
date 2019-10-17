@@ -1,0 +1,103 @@
+# -*- coding: utf-8 -*-
+"""
+FIN T-480
+Created on Mon Mar 18 20:24:29 2019
+Time complexity O(n)
+
+@author: Ryan_Kelly
+"""
+import numpy as np
+import seaborn as sns
+import pandas as pd
+import os
+from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt2
+
+#List of file names 
+csvList = ['Monocentric_City_Data _1980.csv','Monocentric_City_Data_1990.csv',
+         'Monocentric_City_Data_2000.csv','Monocentric_City_Data_2010.csv',
+         'Monocentric_City_Data_2018.csv']
+
+X = 'Dist_CBD'
+Y = 'Price_SqFt'
+
+def regression_graph(file,xvar, yvar):
+    #Creates a dataframe of the data
+    df= pd.read_csv(str(file),index_col = 0 ,encoding ='cp1252')
+    
+    #removes the .CSV extension
+    file = os.path.splitext(file)[0]
+    file_reg = str(file)+ " reg"+" Y="+yvar+" X="+xvar
+    #Sets the size of the Fig
+    plt.figure(figsize=(10,6))
+    plt.xlim(0,18)
+    
+    #Creates the Fig
+    rp = sns.regplot(x=X, y=Y,data=df)
+    rsq = df['Price_SqFt'].corr(other=df['Dist_CBD'])
+    print(rsq)
+    #Creates an object of the figuare type
+    fig = rp.figure
+    
+    #Adds the title
+    fig.suptitle(str(file_reg),fontsize=12)
+    
+    #Saves as .png
+    fig.savefig(file)
+   
+
+def rsquare(file):
+    df = pd.read_csv(str(file),index_col =0,encoding = 'cp1252')
+    
+    yvar = df[Y]
+    xvar = df[X]
+    
+     # number of observations/points 
+    n = np.size(xvar) 
+    
+    # mean of x and y vector 
+    m_x, m_y = np.mean(xvar), np.mean(yvar) 
+  
+    # calculating cross-deviation and deviation about x 
+    SS_xy = np.sum(yvar*xvar) - n*m_y*m_x 
+    SS_xx = np.sum(xvar*xvar) - n*m_x*m_x 
+  
+    # calculating regression coefficients 
+    b_1 = SS_xy / SS_xx 
+    b_0 = m_y - b_1*m_x 
+  
+    b_1 = format(b_1,'.6f')
+    b_0 = format((b_0),'.6f')
+    
+    return(b_1, b_0)
+    
+def sumStats(y,year):
+    
+    stats_df = pd.DataFrame({'Slope':y,
+                             'Year':year})
+    
+    plt2.figure(figsize=(10,6))
+    plt2.ylim(1900, 2040)
+    
+    ax = sns.barplot(x='Slope', y='Year', data=stats_df)
+    
+    fig = ax.figure
+    fig.savefig("barGraph")
+    
+def main():
+    
+    ylist = []
+    year_list = [1980,1990,2000,2010,2018]
+    
+    for i in csvList:
+        x,y= rsquare(i)
+        regression_graph(i,x,y)
+        ylist.append(y)
+        
+    sumStats(ylist, year_list)    
+    
+if __name__ == '__main__':
+    main()
+    
+    
+    
