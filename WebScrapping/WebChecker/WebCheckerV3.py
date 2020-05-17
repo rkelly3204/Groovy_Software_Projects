@@ -10,19 +10,52 @@ options = Options()
 options.headless = True
 driver = webdriver.Chrome(options=options)
 
-logging.basicConfig(filename = 'WebCheckerV2.log',
+logging.basicConfig(filename = 'WebCheckerV3.log',
                     level= logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(message)s'
                     )
 
 df = pd.DataFrame({
     'Date Modified':['5/17/2020', '5/17/2020','5/17/2020','5/17/2020','5/17/2020'],
-    'URL':['https://www.amazon.com/', 'https://www.google.com/','https://www.tesla.com/','https://finance.yahoo.com/','https://www.linkedin.com/feed/'],
+    'URL':['https://www.nationmaster.com/country-info/stats/Media/Internet-users', 'http://en.www.inegi.org.mx/app/tabulados/default.html?nc=807',
+           'http://en.www.inegi.org.mx/app/tabulados/default.html?nc=448','http://en.www.inegi.org.mx/app/tabulados/default.html?nc=535',
+           'http://en.www.inegi.org.mx/app/tabulados/default.aspx?nc=ca55_2018'],
     'HASH':['NA','NA','NA','NA','NA'],
     'Updated': ['N','N','N','N','N']
 })
+class Database():
+
+    def __init__(self):
+        self.dbLen = 4
+        self.row = 0
+        self.colUrl = 'URL'
+        self.colHash = 'HASH'
+
+    def urlGetter(self):
+        url = df.loc[self.row, self.colUrl]
+        return url
+
+    def hashGetter(self):
+        hash = df.loc[self.row, self.colHash]
+        return hash
+
+    def hashChanger(self, hash):
+        hash = hash
+        df.at[self.row, self.colHash] = hash
+        self.row += 1
+        Database.dbChecker(self)
+
+    def dbChecker(self):
+        if self.row >= self.dbLen:
+            self.row = 0
 
 class Checker:
+
+    def __init__(self):
+        self.dbLen = 4
+        self.row = 0
+        self.colUrl = 'URL'
+        self.colHash = 'HASH'
 
     def hash(self, text):
         hashObj = hashlib.md5()
@@ -65,47 +98,29 @@ class Checker:
 
         return hsh
 
-    def bot(self, url):
-        oldHash = self.worker(url)
+    def bot(self):
+        url = Database.urlGetter(self)
 
-        while True:
+        if Database.hashGetter(self) == 'NA':
+            oldHash = self.worker(url)
+            Database.hashChanger(self,oldHash)
+
+        else:
             newHash = self.worker(url)
 
-            if oldHash == newHash:
+            if Database.hashGetter(self) == newHash:
                 botOutput = "Nothing new"
                 logging.info('bot(output): {}'.format(botOutput))
 
             else:
                 botOutput = "Something new"
                 logging.info('bot(output): {}'.format(botOutput))
-                oldHash = newHash
+                Database.hashChanger(self,newHash)
 
             sleep(10)
 
-class Database():
-
-    def __init__(self):
-        self.dbLen = 4
-        self.row = 0
-        self.colUrl = 'URL'
-        self.colHash = 'HASH'
-
-    def urlGetter(self):
-        url = df.loc[self.row, self.colUrl]
-        return url
-
-    def hashChanger(self, hash):
-        hash = hash
-        df.at[self.row, self.colHash] = hash
-        self.row += 1
-        Database.dbChecker(self)
-
-    def dbChecker(self):
-        if self.row >= self.dbLen:
-            self.row = 0
-
 
 if __name__ == '__main__':
-    url = 'https://www.nationmaster.com/country-info/stats/Media/Internet-users'
     c = Checker()
-    c.bot(url)
+    while True:
+        c.bot()
