@@ -16,6 +16,8 @@ options.add_argument("enable-automation")
 options.add_argument("--disable-infobars")
 options.add_argument("--disable-dev-shm-usage")
 
+driver = webdriver.Chrome(options=options)
+
 logging.basicConfig(filename = 'WebCheckerV3.log',
                     level= logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(message)s'
