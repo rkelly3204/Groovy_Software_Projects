@@ -7,8 +7,14 @@ from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 
 options = Options()
-options.headless = True
-driver = webdriver.Chrome(options=options)
+options.add_argument("--headless")
+options.add_argument("window-size=1400,1500")
+options.add_argument("--disable-gpu")
+options.add_argument("--no-sandbox")
+options.add_argument("start-maximized")
+options.add_argument("enable-automation")
+options.add_argument("--disable-infobars")
+options.add_argument("--disable-dev-shm-usage")
 
 logging.basicConfig(filename = 'WebCheckerV3.log',
                     level= logging.INFO,
@@ -75,7 +81,7 @@ class Checker:
 
         return sourceHtml
 
-    def cleanHtml(self,sourceHtml):
+    def cleanHtml(self, sourceHtml):
         clean = self.parse(sourceHtml)
         return clean
 
@@ -115,7 +121,7 @@ class Checker:
             else:
                 botOutput = "Something new"
                 logging.info('bot(output): {}'.format(botOutput))
-                Database.hashChanger(self,newHash)
+                Database.hashChanger(self, newHash)
 
             sleep(10)
 
