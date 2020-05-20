@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+
 import logging
 import hashlib
 import pandas as pd
 from time import sleep
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from bs4 import BeautifulSoup
 
 options = Options()
 options.add_argument("--headless")
@@ -77,10 +79,9 @@ class Checker:
         return table
 
     def dirtyHtml(slef, url):
-
         driver.get(url)
+        sleep(5)
         sourceHtml = driver.page_source
-
         return sourceHtml
 
     def cleanHtml(self, sourceHtml):
@@ -90,8 +91,8 @@ class Checker:
     def handler(self, clean):
 
         if clean is None:
-            output = "No table"
-            logging.info('handler(output): {}'.format(output))
+            logging.info('handler(output): No Table')
+
         else:
             encoded = self.hash(clean)
             return encoded
@@ -117,16 +118,13 @@ class Checker:
             newHash = self.worker(url)
 
             if Database.hashGetter(self) == newHash:
-                botOutput = "Nothing new"
-                logging.info('bot(output): {}'.format(botOutput))
+                logging.info('bot(output): Nothing new')
 
             else:
-                botOutput = "Something new"
-                logging.info('bot(output): {}'.format(botOutput))
+                logging.info('bot(output): Something new')
                 Database.hashChanger(self, newHash)
 
             sleep(10)
-
 
 if __name__ == '__main__':
     c = Checker()
