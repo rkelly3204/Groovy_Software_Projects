@@ -52,12 +52,16 @@ class Database():
     def hashChanger(self, hash):
         hash = hash
         df.at[self.row, self.colHash] = hash
-        self.row += 1
+        Database.rowIncrementor(self)
         Database.dbChecker(self)
+
+    def rowIncrementor(self):
+        self.row += 1
 
     def dbChecker(self):
         if self.row >= self.dbLen:
             self.row = 0
+
 
 class Checker:
 
@@ -119,6 +123,7 @@ class Checker:
 
             if Database.hashGetter(self) == newHash:
                 logging.info('bot(output): Nothing new')
+                Database.rowIncrementor(self)
 
             else:
                 logging.info('bot(output): Something new')
