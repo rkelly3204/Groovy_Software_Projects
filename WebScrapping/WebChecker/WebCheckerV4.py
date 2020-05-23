@@ -79,7 +79,16 @@ class Checker:
     def parse(self, dirtyHtml):
         bs = BeautifulSoup(dirtyHtml, 'html.parser')
         table = bs.find(lambda tag: tag.name == 'table')
-        return table
+        tableRows = table.find_all('tr')
+        tableArray = []
+        for tr in tableRows:
+            td = tr.find_all('td')
+            row = [i.text for i in td]
+            tableArray.append(str(row))
+            
+        tableList = ''.join(tableArray)
+        
+        return tableList
 
 
     def dirtyHtml(slef, url):
