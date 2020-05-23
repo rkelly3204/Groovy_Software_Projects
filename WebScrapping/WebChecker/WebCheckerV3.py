@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import logging
 import hashlib
 import pandas as pd
@@ -7,6 +6,8 @@ from time import sleep
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+
 
 options = Options()
 options.add_argument("--headless")
@@ -18,7 +19,7 @@ options.add_argument("enable-automation")
 options.add_argument("--disable-infobars")
 options.add_argument("--disable-dev-shm-usage")
 
-driver = webdriver.Chrome(options=options)
+driver = webdriver.Chrome(ChromeDriverManager().install(),options=options)
 
 logging.basicConfig(filename = 'WebCheckerV3.log',
                     level= logging.INFO,
