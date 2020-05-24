@@ -84,7 +84,7 @@ class Checker:
         for tr in tableRows:
             td = tr.find_all('td')
             row = [i.text for i in td]
-            tableArray.append(str(row))
+            tableArray.append(str(row)[1:-1])
             
         tableList = ''.join(tableArray)
         
